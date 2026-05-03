@@ -1,4 +1,5 @@
 # REPLIT-CTS
+(CUT THE SHIT)
 
 An execution protocol skill for Replit Agent.
 
