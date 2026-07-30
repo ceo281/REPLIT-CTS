@@ -41,18 +41,16 @@
     background-size:cover; background-position:center;
     transition:transform .35s ease, box-shadow .35s ease;
   }
+  /* moving video background layer */
+  .card-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;pointer-events:none}
   .card::before{ content:""; position:absolute; inset:0; z-index:-1;
-    background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.72) 100%); }
+    background:linear-gradient(180deg, rgba(0,0,0,.20) 0%, rgba(0,0,0,.40) 55%, rgba(0,0,0,.74) 100%); }
   .card:hover{transform:translateY(-4px) scale(1.015)}
 
-  .card--freq{
-    background-image:url('https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/38367144-d0a1-4363-84fa-a3c129fdd6bf_1600w.jpg');
-    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(16,185,129,.18);
-  }
-  .card--breath{
-    background-image:url('https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/a3f1cd61-1f82-44be-b97d-dc1fa1132370_1600w.jpg');
-    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(34,211,238,.18);
-  }
+  .card--freq{ background:#022c22;
+    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(16,185,129,.18); }
+  .card--breath{ background:#02122b;
+    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(34,211,238,.18); }
 
   .row{display:flex;align-items:center;justify-content:space-between}
   .pill{font-size:11px;font-weight:500;padding:6px 12px;border-radius:999px;letter-spacing:.02em}
@@ -149,6 +147,9 @@
 
       <!-- ============ CARD 1 — the fish card + healing Hz ============ -->
       <section class="card card--freq" aria-label="Daily mindfulness with healing frequencies">
+        <video class="card-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+          <source src="assets/card1.mp4" type="video/mp4">
+        </video>
         <div class="stack">
           <div class="row">
             <svg class="ico" style="color:#a7f3d0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
@@ -190,6 +191,9 @@
 
       <!-- ============ CARD 3 — 4-7-8 breathing ============ -->
       <section class="card card--breath" aria-label="4-7-8 breathing">
+        <video class="card-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+          <source src="assets/card3.mp4" type="video/mp4">
+        </video>
         <div class="stack">
           <div class="row">
             <svg class="ico" style="color:#bfdbfe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg>
@@ -430,9 +434,17 @@
   soundToggle.addEventListener("click",toggleSound);
   soundToggle.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleSound();} });
 
-  /* be a good embed citizen: silence when the tab is hidden */
+  /* make sure the moving video backgrounds keep playing */
+  var bgVids=document.querySelectorAll("video.card-bg");
+  function playBg(){ bgVids.forEach(function(v){ var pr=v.play(); if(pr&&pr.catch) pr.catch(function(){}); }); }
+  playBg();
+  window.addEventListener("load", playBg);
+  document.addEventListener("pointerdown", playBg);
+
+  /* be a good embed citizen: silence audio when the tab is hidden */
   document.addEventListener("visibilitychange",function(){
     if(document.hidden){ if(playing) pause(); if(bRunning) stopBreath(); }
+    else playBg();
   });
 })();
 </script>

@@ -2,12 +2,26 @@
 
 Two meditation cards, ready to drop into any website:
 
-1. **Card 1 — Daily Mindfulness** (the fish image) with a **curated healing-frequency player**
-2. **Card 3 — 4-7-8 Breathing** (its own image) with a guided breathing orb + soft 432 Hz pacing tone
+1. **Card 1 — Daily Mindfulness** with a **curated healing-frequency player**, over a **moving video background** (`assets/card1.mp4`)
+2. **Card 3 — 4-7-8 Breathing** with a guided breathing orb + soft 432 Hz pacing tone, over a **moving video background** (`assets/card3.mp4`)
 
+The video backgrounds autoplay, loop, and are muted (so they start on their own).
 The healing tones are **generated live in the browser** with the Web Audio API — the exact
-Hz shown is the exact Hz you hear. There are **no audio files to host** and, apart from the two
-background photos, **no external dependencies**.
+Hz shown is the exact Hz you hear. **No external servers, no CDNs** — the widget ships with
+its own files.
+
+## Files
+
+```
+meditation-widget/
+├── index.html        ← the widget
+└── assets/
+    ├── card1.mp4      ← moving background for card 1
+    └── card3.mp4      ← moving background for card 3
+```
+
+Keep `index.html` and the `assets/` folder together. To swap the two clips, just replace the
+files (same names), or swap the two `<source src="assets/…">` lines in `index.html`.
 
 ## Curated frequencies
 
@@ -56,12 +70,11 @@ Use this only if your site's CSS won't collide — the iframe option avoids that
 ## Notes
 
 - **Sound needs a click.** Browsers only allow audio after a user gesture, so the first tone
-  starts when the visitor taps a frequency chip or the play button — this is expected.
+  starts when the visitor taps a frequency row or the play button — this is expected.
+- **The video backgrounds move on their own** (autoplay + loop + muted). They're bundled in
+  `assets/`, so there's nothing external to break.
 - **Headphones** give the best experience for low frequencies (174/396 Hz).
-- **Images.** The two photos are loaded from their original hosted URLs. For maximum reliability
-  on your own site, download them and change the two `background-image` URLs in the `<style>`
-  block to your own copies.
-- The widget auto-silences itself when its browser tab is hidden.
+- The widget auto-silences its tones when its browser tab is hidden (the muted video keeps looping).
 
 ## Local preview
 
