@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mindful — Healing Sounds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:wght@400&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Mindful — Healing Sounds widget (cards 1 + 3)
+     Faithful to the original design. Fully self-contained:
+     healing tones are synthesised live via the Web Audio API,
+     so the exact Hz you see is the exact Hz you hear — no files.
+     ============================================================ */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    color:#fff; min-height:100%;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(16,185,129,.10), transparent 60%),
+      radial-gradient(1000px 600px at 90% 110%, rgba(34,211,238,.10), transparent 60%),
+      #0a0a0a;
+    display:flex; align-items:center; justify-content:center;
+    padding:32px 16px;
+  }
+  .serif{font-family:'Instrument Serif',Georgia,serif;font-weight:400}
+  .sans{font-family:'Inter',system-ui,sans-serif}
+  .wrap{width:100%;max-width:760px}
+  .grid{display:grid;gap:28px;grid-template-columns:1fr}
+  @media(min-width:660px){ .grid{grid-template-columns:1fr 1fr} }
+
+  /* ---------- shared card ---------- */
+  .card{
+    position:relative; overflow:hidden; isolation:isolate;
+    display:flex; flex-direction:column; justify-content:space-between;
+    border-radius:24px; padding:30px;
+    aspect-ratio:3/5; min-height:520px;
+    background-size:cover; background-position:center;
+    transition:transform .35s ease, box-shadow .35s ease;
+  }
+  .card::before{ content:""; position:absolute; inset:0; z-index:-1;
+    background:linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.35) 55%, rgba(0,0,0,.72) 100%); }
+  .card:hover{transform:translateY(-4px) scale(1.015)}
+
+  .card--freq{
+    background-image:url('https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/38367144-d0a1-4363-84fa-a3c129fdd6bf_1600w.jpg');
+    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(16,185,129,.18);
+  }
+  .card--breath{
+    background-image:url('https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/a3f1cd61-1f82-44be-b97d-dc1fa1132370_1600w.jpg');
+    box-shadow:0 25px 50px -12px rgba(0,0,0,.5),0 0 0 1px rgba(34,211,238,.18);
+  }
+
+  .row{display:flex;align-items:center;justify-content:space-between}
+  .pill{font-size:11px;font-weight:500;padding:6px 12px;border-radius:999px;letter-spacing:.02em}
+  .pill--e{background:rgba(52,211,153,.22);color:#a7f3d0}
+  .pill--b{background:rgba(96,165,250,.22);color:#bfdbfe}
+  .ico{width:32px;height:32px}
+  .ico--sm{width:16px;height:16px}
+  .brand{font-weight:600;font-size:11px;letter-spacing:.14em}
+  .stack{display:flex;flex-direction:column;gap:22px}
+
+  /* ---------- card 1 (fish) content ---------- */
+  .c1-title{font-size:34px;line-height:1;letter-spacing:-.01em}
+  .c1-sub{color:#a7f3d0;font-size:17px;margin-top:8px;font-weight:400}
+  .c1-min{position:absolute;top:0;right:0;text-align:right}
+  .c1-min .n{color:#a7f3d0;font-size:24px}
+  .c1-min .l{color:#6ee7b7;font-size:13px;font-weight:300}
+
+  .foot{border-top:1px solid rgba(16,185,129,.35);padding-top:20px}
+  .foot--b{border-top-color:rgba(96,165,250,.35)}
+  .quote{color:#d1fae5;font-size:13px;line-height:1.55;font-weight:300}
+
+  /* frequency chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 2px}
+  .chip{
+    cursor:pointer;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);
+    color:#ecfdf5;font-family:inherit;font-size:11.5px;font-weight:500;
+    padding:5px 10px;border-radius:999px;font-variant-numeric:tabular-nums;
+    transition:background .18s,border-color .18s,transform .12s;
+  }
+  .chip:hover{background:rgba(16,185,129,.28);border-color:rgba(52,211,153,.5)}
+  .chip.active{background:#34d399;border-color:#34d399;color:#022c22;font-weight:600}
+
+  .now{font-size:12.5px;color:#d1fae5;min-height:32px;line-height:1.45;margin-top:6px}
+
+  .ctrls{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .playbtn{flex:none;display:grid;place-items:center;cursor:pointer;
+    width:48px;height:48px;border-radius:999px;border:none;background:#34d399;color:#022c22;
+    transition:transform .15s,background .2s;}
+  .playbtn:hover{transform:scale(1.06)} .playbtn:active{transform:scale(.95)}
+  .playbtn svg{width:20px;height:20px}
+  .playbtn--b{background:#60a5fa;color:#02122b}
+  .vol{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:999px;
+    background:rgba(255,255,255,.25);outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:999px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:999px;background:#fff}
+
+  .metarow{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:12px}
+  .checkline{display:flex;align-items:center;gap:8px}
+
+  /* ---------- card 3 (breathing) content ---------- */
+  .c3-title{font-size:28px;line-height:1.05}
+  .c3-sub{color:#bfdbfe;font-size:15px;margin-top:8px}
+  .c3-min{position:absolute;top:0;right:0;text-align:right}
+  .c3-min .n{color:#bfdbfe;font-size:24px}
+  .c3-min .l{color:#93c5fd;font-size:13px;font-weight:300}
+
+  .breath-stage{flex:1;display:grid;place-items:center;position:relative;min-height:160px;margin:8px 0}
+  .orb-wrap{position:relative;width:168px;height:168px;display:grid;place-items:center}
+  .orb{position:absolute;inset:0;border-radius:999px;transform:scale(.55);
+    background:radial-gradient(circle at 35% 30%,rgba(191,219,254,.95),rgba(37,99,235,.5) 55%,rgba(2,18,43,0) 72%);
+    box-shadow:0 0 60px rgba(96,165,250,.4);transition:transform 4s ease-in-out}
+  .orb-ring{position:absolute;inset:0;border-radius:999px;border:1px solid rgba(147,197,253,.4)}
+  .orb-text{position:relative;text-align:center}
+  .orb-text .phase{font-size:18px} .orb-text .count{font-size:38px;line-height:1;margin-top:2px;font-variant-numeric:tabular-nums}
+  .breath-meta{display:flex;justify-content:space-between;color:#bfdbfe;font-size:12.5px}
+
+  .togglesound{display:flex;align-items:center;gap:8px;font-size:12px;color:#bfdbfe;cursor:pointer;user-select:none}
+  .switch{width:36px;height:20px;border-radius:999px;background:rgba(255,255,255,.25);position:relative;transition:background .2s}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:999px;background:#fff;transition:left .2s}
+  .togglesound.on .switch{background:#60a5fa}
+  .togglesound.on .switch::after{left:19px}
+
+  .muted{opacity:.8}
+  .footnote{margin-top:22px;text-align:center;color:rgba(255,255,255,.35);font-size:11px;line-height:1.5}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- ============ CARD 1 — the fish card + healing Hz ============ -->
+      <section class="card card--freq" aria-label="Daily mindfulness with healing frequencies">
+        <div class="stack">
+          <div class="row">
+            <svg class="ico" style="color:#a7f3d0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>
+            <span class="pill pill--e">Today</span>
+          </div>
+          <div style="position:relative">
+            <p class="c1-title serif">7 Day Streak</p>
+            <p class="c1-sub sans">Morning Meditation</p>
+            <div class="c1-min">
+              <p class="n serif">12 min</p>
+              <p class="l sans">completed</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">
+          <p class="quote sans">Breathe deeply and find your center — a curated healing tone, tuned to the exact frequency.</p>
+
+          <div class="chips" id="chips"><!-- injected --></div>
+          <p class="now sans" id="freqNow">Tap a frequency to begin. Best with headphones.</p>
+
+          <div class="ctrls">
+            <button class="playbtn" id="freqPlay" aria-label="Play / pause">
+              <svg id="freqPlayIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="vol">
+              <svg class="ico--sm" style="color:#a7f3d0;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              <input type="range" id="freqVol" min="0" max="100" value="45" aria-label="Volume">
+            </div>
+          </div>
+
+          <div class="metarow">
+            <div class="checkline">
+              <span class="brand sans">MINDFUL</span>
+              <svg class="ico--sm" style="color:#a7f3d0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
+            </div>
+            <span class="muted sans" id="freqState" style="color:#a7f3d0">idle</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CARD 3 — 4-7-8 breathing ============ -->
+      <section class="card card--breath" aria-label="4-7-8 breathing">
+        <div class="stack">
+          <div class="row">
+            <svg class="ico" style="color:#bfdbfe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/></svg>
+            <span class="pill pill--b">Active</span>
+          </div>
+          <div style="position:relative">
+            <p class="c3-title serif">4-7-8 Breathing</p>
+            <p class="c3-sub sans">Calming Technique</p>
+            <div class="c3-min">
+              <p class="n serif">5 min</p>
+              <p class="l sans">session</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="breath-stage">
+          <div class="orb-wrap">
+            <div class="orb-ring"></div>
+            <div class="orb" id="orb"></div>
+            <div class="orb-text">
+              <div class="phase serif" id="breathPhase">Ready</div>
+              <div class="count serif" id="breathCount">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="breath-meta">
+          <span class="sans">Inhale 4 · Hold 7 · Exhale 8</span>
+          <span class="sans" id="breathCycles">0 cycles</span>
+        </div>
+
+        <div class="foot foot--b" style="margin-top:14px">
+          <p class="quote sans" style="color:#dbeafe">Master the ancient breathing pattern that naturally reduces stress — paced by a soft 432 Hz tone.</p>
+          <div class="ctrls">
+            <button class="playbtn playbtn--b" id="breathPlay" aria-label="Start / stop">
+              <svg id="breathPlayIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="togglesound on" id="breathSound" role="switch" aria-checked="true" tabindex="0">
+              <span class="switch"></span><span>Tone</span>
+            </div>
+            <span style="flex:1"></span>
+            <span class="brand sans">MINDFUL</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    <p class="footnote">
+      Tones are generated live in your browser at the exact frequency shown.
+      A relaxation aid — not a medical device or treatment.
+    </p>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Curated scientific / Solfeggio healing frequencies ---------- */
+  var FREQS = [
+    {hz:174, name:"Foundation",   note:"Grounding · a gentle sense of safety and ease."},
+    {hz:396, name:"Liberation",   note:"Releasing fear and tension · root."},
+    {hz:432, name:"Natural Tune", note:"Warm, calming reference pitch."},
+    {hz:528, name:"Renewal",      note:"The ‘love’ frequency · balance and repair."},
+    {hz:639, name:"Connection",   note:"Harmony, empathy, relationships."},
+    {hz:741, name:"Cleansing",    note:"Clarity, expression, letting go."},
+    {hz:852, name:"Intuition",    note:"Returning to inner awareness."},
+    {hz:963, name:"Awakening",    note:"Stillness and a sense of oneness."}
+  ];
+  var DEFAULT_IDX = 3; // 528 Hz
+
+  /* ---------- Web Audio core (single shared context) ---------- */
+  var AC = null, master = null;
+  function ctx(){
+    if(!AC){
+      AC = new (window.AudioContext||window.webkitAudioContext)();
+      master = AC.createGain(); master.gain.value = 0.0001; master.connect(AC.destination);
+    }
+    if(AC.state === "suspended") AC.resume();
+    return AC;
+  }
+  function fadeMasterTo(v, t){
+    var c=ctx(), now=c.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(Math.max(master.gain.value,0.0001), now);
+    master.gain.exponentialRampToValueAtTime(Math.max(v,0.0001), now+t);
+  }
+
+  var ICON_PLAY='<path d="M8 5v14l11-7z"/>', ICON_PAUSE='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+
+  /* ===================== CARD 1: healing frequency player ===================== */
+  var chipsEl=document.getElementById("chips"),
+      nowEl=document.getElementById("freqNow"),
+      stateEl=document.getElementById("freqState"),
+      playBtn=document.getElementById("freqPlay"),
+      playIcon=document.getElementById("freqPlayIcon"),
+      volEl=document.getElementById("freqVol");
+
+  var freqGain=null, oscA=null, oscB=null, currentIdx=-1, playing=false;
+
+  FREQS.forEach(function(f,i){
+    var b=document.createElement("button");
+    b.className="chip"; b.type="button"; b.textContent=f.hz+" Hz";
+    b.title=f.name; b.addEventListener("click",function(){ selectFreq(i); });
+    chipsEl.appendChild(b);
+  });
+
+  function volValue(){ return Math.pow(volEl.value/100,1.6)*0.5; }
+
+  function buildChain(hz){
+    var c=ctx();
+    freqGain=c.createGain(); freqGain.gain.value=0.0001;
+    var lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2200; lp.Q.value=0.4;
+    oscA=c.createOscillator(); oscA.type="sine"; oscA.frequency.value=hz;
+    oscB=c.createOscillator(); oscB.type="sine"; oscB.frequency.value=hz; oscB.detune.value=4;
+    var mix=c.createGain(); mix.gain.value=0.5;
+    oscA.connect(mix); oscB.connect(mix); mix.connect(lp); lp.connect(freqGain); freqGain.connect(master);
+    oscA.start(); oscB.start();
+  }
+  function startTone(hz){
+    buildChain(hz);
+    var c=ctx(), now=c.currentTime;
+    freqGain.gain.setValueAtTime(0.0001,now);
+    freqGain.gain.exponentialRampToValueAtTime(0.9, now+1.2);
+    fadeMasterTo(volValue(),1.2);
+  }
+  function stopTone(cb){
+    if(!oscA){ if(cb) cb(); return; }
+    var c=ctx(), now=c.currentTime;
+    freqGain.gain.cancelScheduledValues(now);
+    freqGain.gain.setValueAtTime(Math.max(freqGain.gain.value,0.0001),now);
+    freqGain.gain.exponentialRampToValueAtTime(0.0001, now+0.5);
+    var a=oscA,b=oscB; oscA=oscB=null;
+    setTimeout(function(){ try{a.stop();b.stop();}catch(e){} if(cb) cb(); },520);
+  }
+  function selectFreq(i){
+    if(i===currentIdx && playing){ pause(); return; }
+    var chips=chipsEl.children;
+    for(var k=0;k<chips.length;k++) chips[k].classList.toggle("active",k===i);
+    currentIdx=i;
+    var f=FREQS[i];
+    nowEl.innerHTML='<strong>'+f.hz+' Hz · '+f.name+'</strong><br>'+f.note;
+    stopTone(function(){
+      startTone(f.hz); playing=true;
+      playIcon.innerHTML=ICON_PAUSE; stateEl.textContent="playing "+f.hz+" Hz";
+    });
+  }
+  function pause(){ stopTone(); playing=false; playIcon.innerHTML=ICON_PLAY; stateEl.textContent="paused"; }
+
+  playBtn.addEventListener("click",function(){
+    if(playing){ pause(); return; }
+    selectFreq(currentIdx<0?DEFAULT_IDX:currentIdx);
+  });
+  volEl.addEventListener("input",function(){ if(playing) fadeMasterTo(volValue(),0.15); });
+
+  /* ===================== CARD 3: 4-7-8 breathing ===================== */
+  var orb=document.getElementById("orb"),
+      phaseEl=document.getElementById("breathPhase"),
+      countEl=document.getElementById("breathCount"),
+      cyclesEl=document.getElementById("breathCycles"),
+      bPlay=document.getElementById("breathPlay"),
+      bPlayIcon=document.getElementById("breathPlayIcon"),
+      soundToggle=document.getElementById("breathSound");
+
+  var PHASES=[{name:"Inhale",secs:4},{name:"Hold",secs:7},{name:"Exhale",secs:8}];
+  var bRunning=false,bTimer=null,bTick=null,phaseIdx=0,remaining=0,cycles=0,soundOn=true;
+  var bOsc=null,bGain=null;
+
+  function breathToneStart(){
+    if(!soundOn) return;
+    var c=ctx();
+    bGain=c.createGain(); bGain.gain.value=0.0001;
+    bOsc=c.createOscillator(); bOsc.type="sine"; bOsc.frequency.value=432;
+    var lpf=c.createBiquadFilter(); lpf.type="lowpass"; lpf.frequency.value=1600;
+    bOsc.connect(lpf); lpf.connect(bGain); bGain.connect(master);
+    fadeMasterTo(0.35,0.4); bOsc.start();
+  }
+  function breathToneStop(){
+    if(!bOsc) return;
+    var c=ctx(), now=c.currentTime, o=bOsc, g=bGain;
+    g.gain.cancelScheduledValues(now); g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+0.4);
+    setTimeout(function(){ try{o.stop();}catch(e){} },450); bOsc=null; bGain=null;
+  }
+  function breathToneShape(p){
+    if(!bOsc||!bGain) return;
+    var c=ctx(), now=c.currentTime, dur=p.secs;
+    bGain.gain.cancelScheduledValues(now); bGain.gain.setValueAtTime(Math.max(bGain.gain.value,0.0001),now);
+    if(p.name==="Inhale"){
+      bOsc.frequency.setValueAtTime(432,now); bOsc.frequency.linearRampToValueAtTime(540,now+dur);
+      bGain.gain.exponentialRampToValueAtTime(0.5,now+dur);
+    } else if(p.name==="Hold"){
+      bGain.gain.exponentialRampToValueAtTime(0.28,now+dur);
+    } else {
+      bOsc.frequency.setValueAtTime(bOsc.frequency.value,now); bOsc.frequency.linearRampToValueAtTime(324,now+dur);
+      bGain.gain.exponentialRampToValueAtTime(0.04,now+dur);
+    }
+  }
+  function runPhase(){
+    var p=PHASES[phaseIdx];
+    phaseEl.textContent=p.name; remaining=p.secs; countEl.textContent=remaining;
+    orb.style.transitionDuration=p.secs+"s";
+    orb.style.transform="scale("+(p.name==="Exhale"?0.55:1.0)+")";
+    breathToneShape(p);
+    clearInterval(bTick);
+    bTick=setInterval(function(){ remaining--; if(remaining<=0){clearInterval(bTick);return;} countEl.textContent=remaining; },1000);
+    clearTimeout(bTimer);
+    bTimer=setTimeout(function(){
+      phaseIdx=(phaseIdx+1)%PHASES.length;
+      if(phaseIdx===0){ cycles++; cyclesEl.textContent=cycles+" cycle"+(cycles===1?"":"s"); }
+      runPhase();
+    }, p.secs*1000);
+  }
+  function startBreath(){
+    bRunning=true; bPlayIcon.innerHTML=ICON_PAUSE;
+    phaseIdx=0; cycles=0; cyclesEl.textContent="0 cycles";
+    ctx(); breathToneStart();
+    orb.style.transitionDuration="0.3s"; orb.style.transform="scale(0.55)";
+    setTimeout(runPhase,320);
+  }
+  function stopBreath(){
+    bRunning=false; bPlayIcon.innerHTML=ICON_PLAY;
+    clearTimeout(bTimer); clearInterval(bTick);
+    phaseEl.textContent="Ready"; countEl.textContent="—";
+    orb.style.transitionDuration="1s"; orb.style.transform="scale(0.55)";
+    breathToneStop();
+  }
+  bPlay.addEventListener("click",function(){ if(bRunning) stopBreath(); else startBreath(); });
+
+  function toggleSound(){
+    soundOn=!soundOn;
+    soundToggle.classList.toggle("on",soundOn);
+    soundToggle.setAttribute("aria-checked",soundOn?"true":"false");
+    if(bRunning){ if(soundOn) breathToneStart(); else breathToneStop(); }
+  }
+  soundToggle.addEventListener("click",toggleSound);
+  soundToggle.addEventListener("keydown",function(e){ if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleSound();} });
+
+  /* be a good embed citizen: silence when the tab is hidden */
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){ if(playing) pause(); if(bRunning) stopBreath(); }
+  });
+})();
+</script>
+</body>
+</html>
