@@ -156,11 +156,11 @@
             <span class="pill pill--e">Today</span>
           </div>
           <div style="position:relative">
-            <p class="c1-title serif">7 Day Streak</p>
+            <p class="c1-title serif" id="streakText">Begin today</p>
             <p class="c1-sub sans">Morning Meditation</p>
             <div class="c1-min">
-              <p class="n serif">12 min</p>
-              <p class="l sans">completed</p>
+              <p class="n serif" id="minToday">0 min</p>
+              <p class="l sans">today</p>
             </div>
           </div>
         </div>
@@ -203,7 +203,7 @@
             <p class="c3-title serif">4-7-8 Breathing</p>
             <p class="c3-sub sans">Calming Technique</p>
             <div class="c3-min">
-              <p class="n serif">5 min</p>
+              <p class="n serif" id="sessionTime">0:00</p>
               <p class="l sans">session</p>
             </div>
           </div>
@@ -282,6 +282,54 @@
 
   var ICON_PLAY='<path d="M8 5v14l11-7z"/>', ICON_PAUSE='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
 
+  /* ===================== Persistent stats (this visitor's browser) ===================== */
+  var streakEl=document.getElementById("streakText"),
+      minEl=document.getElementById("minToday"),
+      sessionEl=document.getElementById("sessionTime");
+
+  function LSget(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+  function LSset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function dayIndex(){ var d=new Date(); d.setHours(0,0,0,0); return Math.round(d.getTime()/86400000); }
+
+  var streak=parseInt(LSget("mf_streak","0"),10)||0,
+      lastDay=parseInt(LSget("mf_lastDay","0"),10)||0,
+      minDay=parseInt(LSget("mf_minDay","0"),10)||0,
+      secToday=parseInt(LSget("mf_secToday","0"),10)||0;
+
+  (function initStats(){
+    var t=dayIndex();
+    if(minDay!==t){ minDay=t; secToday=0; LSset("mf_minDay",minDay); LSset("mf_secToday","0"); }
+    var shown = (lastDay===t || lastDay===t-1) ? streak : 0;   // a gap of 2+ days breaks it
+    renderStreak(shown); renderMin();
+  })();
+
+  function renderStreak(n){ streakEl.textContent = n>=1 ? (n+" Day Streak") : "Begin today"; }
+  function renderMin(){ minEl.textContent = Math.floor(secToday/60)+" min"; }
+
+  function recordDayUsed(){
+    var t=dayIndex();
+    if(lastDay===t) return;                 // already counted today
+    streak = (lastDay===t-1) ? streak+1 : 1; // continued yesterday → +1, otherwise fresh start
+    lastDay=t; LSset("mf_streak",streak); LSset("mf_lastDay",lastDay);
+    renderStreak(streak);
+  }
+
+  // Count real minutes while any tone or the breathing guide is active.
+  var freqOn=false, breathOn=false, minTimer=null;
+  function syncActivity(){
+    var any=freqOn||breathOn;
+    if(any && !minTimer){
+      recordDayUsed();
+      minTimer=setInterval(function(){
+        var t=dayIndex();
+        if(minDay!==t){ minDay=t; secToday=0; }
+        secToday++; LSset("mf_secToday",secToday); LSset("mf_minDay",minDay);
+        renderMin();
+      },1000);
+    }
+    if(!any && minTimer){ clearInterval(minTimer); minTimer=null; }
+  }
+
   /* ===================== CARD 1: healing frequency player ===================== */
   var listEl=document.getElementById("freqs"),
       nowEl=document.getElementById("freqNow"),
@@ -341,9 +389,10 @@
     stopTone(function(){
       startTone(f.hz); playing=true;
       playIcon.innerHTML=ICON_PAUSE; stateEl.textContent="playing "+f.hz+" Hz";
+      freqOn=true; syncActivity();
     });
   }
-  function pause(){ stopTone(); playing=false; playIcon.innerHTML=ICON_PLAY; stateEl.textContent="paused"; }
+  function pause(){ stopTone(); playing=false; playIcon.innerHTML=ICON_PLAY; stateEl.textContent="paused"; freqOn=false; syncActivity(); }
 
   playBtn.addEventListener("click",function(){
     if(playing){ pause(); return; }
@@ -362,6 +411,8 @@
 
   var PHASES=[{name:"Inhale",secs:4},{name:"Hold",secs:7},{name:"Exhale",secs:8}];
   var bRunning=false,bTimer=null,bTick=null,phaseIdx=0,remaining=0,cycles=0,soundOn=true;
+  var sessSecs=0, sessTimer=null;
+  function renderSess(){ var m=Math.floor(sessSecs/60), s=sessSecs%60; sessionEl.textContent=m+":"+(s<10?"0"+s:s); }
   var bOsc=null,bGain=null;
 
   function breathToneStart(){
@@ -412,16 +463,21 @@
   function startBreath(){
     bRunning=true; bPlayIcon.innerHTML=ICON_PAUSE;
     phaseIdx=0; cycles=0; cyclesEl.textContent="0 cycles";
+    sessSecs=0; renderSess();
+    clearInterval(sessTimer);
+    sessTimer=setInterval(function(){ sessSecs++; renderSess(); },1000);
     ctx(); breathToneStart();
     orb.style.transitionDuration="0.3s"; orb.style.transform="scale(0.55)";
     setTimeout(runPhase,320);
+    breathOn=true; syncActivity();
   }
   function stopBreath(){
     bRunning=false; bPlayIcon.innerHTML=ICON_PLAY;
-    clearTimeout(bTimer); clearInterval(bTick);
+    clearTimeout(bTimer); clearInterval(bTick); clearInterval(sessTimer); sessTimer=null;
     phaseEl.textContent="Ready"; countEl.textContent="—";
     orb.style.transitionDuration="1s"; orb.style.transform="scale(0.55)";
     breathToneStop();
+    breathOn=false; syncActivity();
   }
   bPlay.addEventListener("click",function(){ if(bRunning) stopBreath(); else startBreath(); });
 
