@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Credit Line Australia, a website presentation</title>
+<meta name="description" content="A website presentation for Credit Line Australia, prepared by AT Collective Enterprises.">
+<script src="./image-slot.js"></script>
+<style>
+  @font-face { font-family: 'Inter'; src: url('./uploads/Inter_18pt-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('./uploads/Inter_18pt-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url('./uploads/Inter_18pt-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+  :root { --page:#051D51; --accent:#B4E717; --black:#04070d; --ink:#FFFFFF;
+          --muted:rgba(255,255,255,.74); --faint:rgba(255,255,255,.5); --line:rgba(255,255,255,.16) }
+  body { margin:0; background:#04070d; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility }
+  a { color:#FFFFFF; text-decoration:none }
+  a:hover { color:#B4E717 }
+  ::selection { background:#B4E717; color:#04070d }
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+<section data-label="Cover" data-screen-label="Cover" data-speaker-notes="Open plainly. This presents the finished site, not a pitch for one." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:flex; flex-direction:column; justify-content:space-between; padding:88px 110px 76px; box-sizing:border-box">
+  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:40px">
+    <span style="font-size:22px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase">A website presentation</span>
+    <span style="font-size:20px; letter-spacing:0.18em; text-transform:uppercase; color:var(--faint)">Prepared for Tali Stewart</span>
+  </div>
+  <div>
+    <h1 style="margin:0; font-weight:700; font-size:150px; line-height:0.98; letter-spacing:-0.035em; text-transform:uppercase">Credit Line<br><span style="color:var(--accent)">Australia</span></h1>
+    <p style="margin:36px 0 0; font-size:26px; line-height:1.5; color:var(--muted); max-width:46ch">The site your 47 years deserve. Built, verified, and ready to walk through.</p>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:40px; border-top:1px solid var(--line); padding-top:30px">
+    <span style="font-size:19px; letter-spacing:0.22em; text-transform:uppercase">AT Collective Enterprises Pty Ltd</span>
+    <span style="font-size:19px; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint)">Aaron Taylor · aaron@atcollective.com.au</span>
+  </div>
+</section>
+
+<section data-label="The problem" data-screen-label="The problem" data-speaker-notes="Mirror of the original problem page: one statement, then the findings woven as prose. Do not read every line aloud; let them scan while you talk to the two or three that sting." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:grid; grid-template-columns:1.05fr 1fr; gap:90px; padding:96px 110px 84px; box-sizing:border-box; align-items:center">
+  <div>
+    <span style="font-size:19px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase; color:var(--accent)">01 / The problem</span>
+    <h2 style="margin:34px 0 0; font-weight:700; font-size:82px; line-height:1.05; letter-spacing:-0.03em">Your site works against the business, not for it.</h2>
+    <p style="margin:36px 0 0; font-size:25px; line-height:1.6; color:var(--muted); max-width:36ch">Right when a client or a lender looks you up, it reads like 2013 instead of 47 years of expertise.</p>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:26px; border-left:1px solid var(--line); padding-left:64px">
+    <p style="margin:0; font-size:22px; line-height:1.55; color:var(--muted)">The legal pages were written for a different company. The Terms of Use name "Creditline Australia Australia Ltd", which does not exist, and carry College Capital's company number, so every protective clause protects a different business.</p>
+    <p style="margin:0; font-size:22px; line-height:1.55; color:var(--muted)">The Privacy Policy is 88 percent identical to College Capital's, including their typos, and twelve years out of date. The complaints page gets your customer's core right backwards.</p>
+    <p style="margin:0; font-size:22px; line-height:1.55; color:var(--muted)">"Mount Waverly" and postcode 3124 sit on every page. The suburb is Mount Waverley, 3149, and the address has been stale since the March 2024 move.</p>
+    <p style="margin:0; font-size:22px; line-height:1.55; color:var(--muted)">On a phone there is no menu, and the only enquiry form is hidden. From the device most clients use, there is no way to reach you.</p>
+    <p style="margin:0; font-size:22px; line-height:1.55; color:var(--muted)">Underneath it all: a 2013 template on software that reached end of life in 2022, with no security headers, four versions of the company's name, and a footer with no company name, no ACN, and no AFCA membership number.</p>
+  </div>
+</section>
+
+<section data-label="The audit" data-screen-label="The audit" data-speaker-notes="The set piece. These four strings are real and live on the site today. The full 56-item audit and the clause-by-clause document review sit behind this deck; offer the document rather than reading it." style="font-family:'Inter',system-ui,sans-serif; background:var(--black); color:var(--ink); display:flex; flex-direction:column; justify-content:center; padding:96px 110px 84px; box-sizing:border-box">
+  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:40px">
+    <h2 style="margin:0; font-weight:700; font-size:60px; line-height:1.08; letter-spacing:-0.025em; max-width:22ch">56 verified defects. Every one found in the delivered code.</h2>
+    <span style="font-size:20px; color:var(--faint); white-space:nowrap">The full audit accompanies this deck</span>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:64px">
+    <figure style="margin:0; display:flex; flex-direction:column; gap:16px; padding:44px 48px; background:var(--page)">
+      <blockquote style="margin:0; font-weight:600; font-size:40px; line-height:1.2; letter-spacing:-0.02em">"Creditline Australia Australia Ltd"</blockquote>
+      <figcaption style="font-size:20px; line-height:1.5; color:var(--muted)">The company named in your own Terms of Use. It does not exist.</figcaption>
+    </figure>
+    <figure style="margin:0; display:flex; flex-direction:column; gap:16px; padding:44px 48px; background:var(--page)">
+      <blockquote style="margin:0; font-weight:600; font-size:40px; line-height:1.2; letter-spacing:-0.02em">"Mount Waverly VIC 3124"</blockquote>
+      <figcaption style="font-size:20px; line-height:1.5; color:var(--muted)">Your address, misspelt with the wrong postcode, on all six pages.</figcaption>
+    </figure>
+    <figure style="margin:0; display:flex; flex-direction:column; gap:16px; padding:44px 48px; background:var(--page)">
+      <blockquote style="margin:0; font-weight:600; font-size:40px; line-height:1.2; letter-spacing:-0.02em">"we may refer the matter to AFCA"</blockquote>
+      <figcaption style="font-size:20px; line-height:1.5; color:var(--muted)">Going to AFCA is the customer's right, not your decision. The complaints page has it backwards.</figcaption>
+    </figure>
+    <figure style="margin:0; display:flex; flex-direction:column; gap:16px; padding:44px 48px; background:var(--page)">
+      <blockquote style="margin:0; font-weight:600; font-size:40px; line-height:1.2; letter-spacing:-0.02em">"Business aquisitions"</blockquote>
+      <figcaption style="font-size:20px; line-height:1.5; color:var(--muted)">Live on the Experts In Finance page, next to a stray encoding character in the homepage copy.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section data-label="The solution" data-screen-label="The solution" data-speaker-notes="The turn. The idea came from their own site; the colours are their own scheme modernised. Nothing was replaced, everything was carried forward properly." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:flex; flex-direction:column; justify-content:center; padding:96px 110px 84px; box-sizing:border-box">
+  <span style="font-size:19px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase; color:var(--accent)">02 / The solution</span>
+  <h2 style="margin:34px 0 0; font-weight:700; font-size:78px; line-height:1.05; letter-spacing:-0.03em; max-width:19ch">A dark, editorial site reimagined around language that was already yours.</h2>
+  <div style="display:flex; flex-direction:column; gap:22px; margin-top:52px; max-width:1420px">
+    <p style="margin:0; font-size:24px; line-height:1.55; color:var(--muted)"><span style="color:var(--accent); font-weight:600">Peculiar commercial loans.</span> The idea was sitting in your existing site, hidden. The new site opens on it: Others see risk. We see the unicorn.</p>
+    <p style="margin:0; font-size:24px; line-height:1.55; color:var(--muted)">Your colours kept, not replaced. The blue deepened to imperial, the lime you already carry sharpened. The same scheme, modernised, never a rebrand.</p>
+    <p style="margin:0; font-size:24px; line-height:1.55; color:var(--muted)">Every borrowed and broken page rebuilt clean from the ground up, and every fact verified before it was typed: one company name, one licence number, the right suburb, the right postcode.</p>
+    <p style="margin:0; font-size:24px; line-height:1.55; color:var(--muted)">The commercial side built in: enquiry on every screen, finance calculators assessed the way a lender assesses, and your real Google reviews doing the talking.</p>
+    <p style="margin:0; font-size:24px; line-height:1.55; color:var(--muted)">Built by hand. No template, no WordPress, no plugins. Nothing to hack and nothing to expire.</p>
+  </div>
+</section>
+
+<section data-label="A preview" data-screen-label="A preview" data-speaker-notes="Full-bleed screenshot of the new hero. Drop the screenshot onto the slide; then switch to the live site and walk it top to bottom." style="font-family:'Inter',system-ui,sans-serif; background:var(--black); color:var(--ink); box-sizing:border-box">
+  <div style="position:absolute; inset:70px 200px 230px 200px">
+    <image-slot id="preview-hero" shape="rect" fit="contain" placeholder="Drop a full screenshot of the new site's hero here"></image-slot>
+  </div>
+  <div style="position:absolute; left:0; right:0; bottom:0; padding:44px 110px 56px; background:linear-gradient(180deg, rgba(4,7,13,0) 0%, rgba(4,7,13,.82) 60%); pointer-events:none">
+    <h2 style="margin:0; font-weight:700; font-size:56px; line-height:1.1; letter-spacing:-0.025em">A preview</h2>
+    <p style="margin:14px 0 0; font-size:23px; line-height:1.5; color:var(--muted); max-width:56ch">Walking through the business, not scanning a template. Designed around what you finance and built mobile-first.</p>
+  </div>
+</section>
+
+<section data-label="What was built" data-screen-label="What was built" data-speaker-notes="The services-overview page, same shape as the original deck. Nine numbered items, everything included." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:flex; flex-direction:column; padding:96px 110px 84px; box-sizing:border-box">
+  <div style="display:flex; align-items:baseline; gap:40px; justify-content:space-between">
+    <span style="font-size:19px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase; color:var(--accent)">03 / What was built</span>
+    <h2 style="margin:0; font-weight:700; font-size:52px; line-height:1.08; letter-spacing:-0.025em">Everything included.</h2>
+  </div>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:44px 64px; margin-top:60px">
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">01</span>&nbsp; Custom design and build</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">A dark, editorial site designed from the ground up. No template, no WordPress, no plugins.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">02</span>&nbsp; Written content</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">Copy rebuilt around peculiar commercial loans, with every fact checked before it was typed.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">03</span>&nbsp; Finance calculators</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">Repayment and borrowing capacity, assessed at the live RBA cash rate with the serviceability buffer built in.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">04</span>&nbsp; Client reviews</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">Your real Google reviews, named clients, presented the way they deserve.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">05</span>&nbsp; Enquiry system</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">A labelled, validated form with proper error and success states. Every enquiry answered by a broker.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">06</span>&nbsp; Corrected details</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">One company name, Mount Waverley VIC 3149, Australian Credit Licence 394740, everywhere.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">07</span>&nbsp; Hero film</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">A full-bleed opening film, muted, playing once, respectful of visitors who prefer reduced motion.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">08</span>&nbsp; Mobile-first build</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">A full-screen menu, generous touch targets, and every enquiry path working on a phone.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">09</span>&nbsp; Ongoing support, optional</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">A monthly service to keep the site healthy and add new content as the business grows.</span></div>
+  </div>
+</section>
+
+<section data-label="The build, in use" data-screen-label="The build, in use" data-speaker-notes="Screenshot of the calculators or the contact section. The line to land: the numbers are assessed the way a lender assesses, live RBA rate, buffer included, with the educational disclaimer in place." style="font-family:'Inter',system-ui,sans-serif; background:var(--black); color:var(--ink); display:flex; flex-direction:column; align-items:center; padding:64px 120px 56px; box-sizing:border-box">
+  <h2 style="margin:0; font-weight:700; font-size:52px; line-height:1.08; letter-spacing:-0.025em; text-align:center">The build, in use</h2>
+  <p style="margin:18px 0 0; font-size:23px; line-height:1.55; color:var(--muted); max-width:66ch; text-align:center">Run the numbers the way a lender would: the calculators pull the live RBA cash rate and apply the serviceability buffer. Below them, real Google reviews and an enquiry form a broker personally answers.</p>
+  <div style="position:relative; width:100%; flex:1; margin-top:36px; min-height:0">
+    <image-slot id="build-screens" shape="rect" fit="contain" placeholder="Drop a screenshot of the calculators or reviews section here"></image-slot>
+  </div>
+</section>
+
+<section data-label="Everything corrected" data-screen-label="Everything corrected" data-speaker-notes="The receipts page. Left column is today's site, right column is the build. Every pair is verifiable." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:flex; flex-direction:column; padding:96px 110px 84px; box-sizing:border-box">
+  <h2 style="margin:0; font-weight:700; font-size:60px; line-height:1.08; letter-spacing:-0.025em">Everything corrected</h2>
+  <div style="display:flex; flex-direction:column; gap:0; margin-top:56px">
+    <div style="display:grid; grid-template-columns:1fr 60px 1fr; align-items:baseline; gap:24px; padding:24px 0; border-top:1px solid var(--line)">
+      <span style="font-size:24px; color:var(--faint)">"Mount Waverly VIC 3124", stale since the 2024 move</span>
+      <span aria-hidden="true" style="font-size:24px; color:var(--accent); text-align:center">→</span>
+      <span style="font-size:24px; font-weight:600">Unit 9, 334-336 Highbury Road, Mount Waverley VIC 3149</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 60px 1fr; align-items:baseline; gap:24px; padding:24px 0; border-top:1px solid var(--line)">
+      <span style="font-size:24px; color:var(--faint)">Four versions of the name, two legal entities</span>
+      <span aria-hidden="true" style="font-size:24px; color:var(--accent); text-align:center">→</span>
+      <span style="font-size:24px; font-weight:600">One name and one licence: Credit Line Australia, ACL 394740</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 60px 1fr; align-items:baseline; gap:24px; padding:24px 0; border-top:1px solid var(--line)">
+      <span style="font-size:24px; color:var(--faint)">Another company's legal documents, twelve years old</span>
+      <span aria-hidden="true" style="font-size:24px; color:var(--accent); text-align:center">→</span>
+      <span style="font-size:24px; font-weight:600">Written for Credit Line, and only Credit Line</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 60px 1fr; align-items:baseline; gap:24px; padding:24px 0; border-top:1px solid var(--line)">
+      <span style="font-size:24px; color:var(--faint)">No mobile menu, the only form hidden on phones</span>
+      <span aria-hidden="true" style="font-size:24px; color:var(--accent); text-align:center">→</span>
+      <span style="font-size:24px; font-weight:600">Every enquiry path working on a phone</span>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 60px 1fr; align-items:baseline; gap:24px; padding:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+      <span style="font-size:24px; color:var(--faint)">A 2013 template on end-of-life software</span>
+      <span aria-hidden="true" style="font-size:24px; color:var(--accent); text-align:center">→</span>
+      <span style="font-size:24px; font-weight:600">Hand-built. Nothing to hack, nothing to expire</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="About me" data-screen-label="About me" data-speaker-notes="Personal close, adapted from the standing About Me. The corporate finance background is the bridge: he speaks their language." style="font-family:'Inter',system-ui,sans-serif; background:var(--black); color:var(--ink); display:grid; grid-template-columns:1fr 1.4fr; gap:90px; padding:96px 110px 84px; box-sizing:border-box; align-items:center">
+  <div>
+    <span style="font-size:19px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase; color:var(--accent)">About me</span>
+    <p style="margin:34px 0 0; font-weight:600; font-size:34px; line-height:1.35; letter-spacing:-0.015em">Every now and then I come across a business whose work genuinely deserves to be represented properly, and I feel almost compelled to build something for it. Forty-seven years of expertise deserved a site that carries it, and I wanted to build it.</p>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:24px; border-left:1px solid var(--line); padding-left:64px">
+    <p style="margin:0; font-size:22px; line-height:1.6; color:var(--muted)">My name's Aaron. I spent years working in global corporate finance before deciding to back myself and work for myself. Since then I've been building businesses and startups of my own, and the honest version is that Credit Line is exactly the kind of business I set out to work with.</p>
+    <p style="margin:0; font-size:22px; line-height:1.6; color:var(--muted)">That finance background is the bridge. I read a balance sheet the way a lender reads one, so the calculators assess the way you would and the copy speaks your clients' language rather than a web designer's. Nothing on the site is decoration for its own sake.</p>
+    <p style="margin:0; font-size:22px; line-height:1.6; color:var(--muted)">The build is finished and verified. Everything you have seen is live and ready to walk through, whenever you are.</p>
+    <p style="margin:16px 0 0; font-size:20px; letter-spacing:0.02em">Aaron Taylor · AT Collective Enterprises · <a href="mailto:aaron@atcollective.com.au">aaron@atcollective.com.au</a></p>
+  </div>
+</section>
+
+<section data-label="Next steps" data-screen-label="Next steps" data-speaker-notes="Close on a clear, low-pressure action. No pricing in the room; the audit document does the rest of the talking. Offer to walk the live site now." style="font-family:'Inter',system-ui,sans-serif; background:var(--page); color:var(--ink); display:flex; flex-direction:column; justify-content:center; padding:96px 110px 84px; box-sizing:border-box">
+  <span style="font-size:19px; font-weight:600; letter-spacing:0.42em; text-transform:uppercase; color:var(--accent)">Next steps</span>
+  <h2 style="margin:34px 0 0; font-weight:700; font-size:78px; line-height:1.05; letter-spacing:-0.03em; max-width:20ch">Walk the site, then it's yours to weigh up.</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:44px 64px; margin-top:60px">
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">01</span>&nbsp; Walk the live site</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">Top to bottom, on desktop and on a phone, so you see every enquiry path working.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">02</span>&nbsp; Read the audit</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">The full 56-item audit and the clause-by-clause document review accompany this deck. Every finding is verifiable against today's site.</span></div>
+    <div style="display:flex; flex-direction:column; gap:10px"><span style="font-weight:700; font-size:23px"><span style="color:var(--accent)">03</span>&nbsp; Say the word</span><span style="font-size:20px; line-height:1.5; color:var(--muted)">When you are ready, the build goes live under your domain. No pressure, and no obligation to decide today.</span></div>
+  </div>
+  <div style="display:flex; justify-content:space-between; align-items:baseline; gap:40px; border-top:1px solid var(--line); padding-top:30px; margin-top:64px">
+    <span style="font-size:19px; letter-spacing:0.22em; text-transform:uppercase">AT Collective Enterprises Pty Ltd</span>
+    <span style="font-size:19px; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint)">Aaron Taylor · aaron@atcollective.com.au</span>
+  </div>
+</section>
+
+</x-import>
+</x-dc>
+</body>
+</html>
