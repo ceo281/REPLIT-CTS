@@ -18,6 +18,13 @@ import type { Transaction } from "../types";
 
 type Period = "month" | "year" | "all";
 
+/** Compact axis label from minor units: 2720c -> "27", 150000c -> "1.5k". */
+function compact(vCents: number): string {
+  const d = vCents / 100;
+  if (Math.abs(d) >= 1000) return `${(d / 1000).toFixed(1)}k`;
+  return `${Math.round(d)}`;
+}
+
 export function ReportsPage() {
   const { dek } = useVault();
   const txns = useAsync(() => listTransactions(dek), [dek]);
@@ -56,9 +63,9 @@ export function ReportsPage() {
         ) : (
           <div style={{ width: "100%", height: 200 }}>
             <ResponsiveContainer>
-              <BarChart data={cashflow} margin={{ top: 8, right: 4, left: -18, bottom: 0 }}>
+              <BarChart data={cashflow} margin={{ top: 8, right: 4, left: 4, bottom: 0 }}>
                 <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={11} stroke="var(--text-faint)" />
-                <YAxis tickFormatter={(v) => (v / 100).toFixed(0)} tickLine={false} axisLine={false} fontSize={11} stroke="var(--text-faint)" width={44} />
+                <YAxis tickFormatter={compact} tickLine={false} axisLine={false} fontSize={11} stroke="var(--text-faint)" width={40} />
                 <Tooltip
                   cursor={{ fill: "var(--surface-2)" }}
                   formatter={(v: number) => money(v)}

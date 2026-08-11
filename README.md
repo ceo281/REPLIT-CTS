@@ -46,3 +46,21 @@ The marginal cost of completeness with AI is near zero. The skill is built aroun
 ## Installation
 
 Install from this repo:
+
+---
+
+## `app/` — Secure Dual-Vault Finance & People Ledger
+
+This repo also contains a working application in [`app/`](./app): a mobile-first
+PWA that functions as a genuine personal finance / ledger app while providing a
+second, independently-encrypted private workspace. The two vaults use **separate
+encryption keys** (Argon2id-wrapped random AES-256-GCM data keys), so unlocking
+one never decrypts the other. IndexedDB stores ciphertext only.
+
+- Quick start and feature list: [`app/README.md`](./app/README.md)
+- Threat model, assumptions, and limits: [`app/SECURITY.md`](./app/SECURITY.md)
+
+```bash
+cd app && npm install && npm test   # crypto/vault/backup tests
+npm run build                        # type-check + production build
+```

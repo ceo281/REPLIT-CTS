@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useSession } from "./session/SessionContext";
 import { useHidden } from "./ui/hooks";
 import { Onboarding } from "./pages/Onboarding";
@@ -18,6 +18,18 @@ import { SettingsPage } from "./pages/Settings";
 export function App() {
   const { status, activeVault, settings, poke } = useSession();
   const hidden = useHidden();
+  const nav = useNavigate();
+
+  // On each unlock, land on the active vault's home so a stale route (e.g. the
+  // Settings page we locked from) doesn't render under the newly opened vault.
+  const wasUnlocked = useRef(false);
+  useEffect(() => {
+    if (status === "unlocked" && activeVault && !wasUnlocked.current) {
+      wasUnlocked.current = true;
+      nav(activeVault === "finance" ? "/finance" : "/people", { replace: true });
+    }
+    if (status !== "unlocked") wasUnlocked.current = false;
+  }, [status, activeVault, nav]);
 
   // Apply theme + per-vault accent to the document root.
   useEffect(() => {
@@ -87,15 +99,3 @@ function PeopleRoutes() {
   );
 }
 
-/** Redirect to the vault home when the active vault changes (e.g. after unlock). */
-export function useVaultHomeRedirect() {
-  const { activeVault } = useSession();
-  const nav = useNavigate();
-  const loc = useLocation();
-  useEffect(() => {
-    if (!activeVault) return;
-    const home = activeVault === "finance" ? "/finance" : "/people";
-    if (!loc.pathname.startsWith(home) && loc.pathname !== "/settings") nav(home, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeVault]);
-}
