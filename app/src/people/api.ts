@@ -75,7 +75,7 @@ export async function saveRecord(dek: CryptoKey, r: PersonRecord): Promise<void>
   await putRecord(dek, VAULT, C.record, r);
 }
 
-export async function deleteRecordById(dek: CryptoKey, id: string): Promise<void> {
+export async function deleteRecordById(_dek: CryptoKey, id: string): Promise<void> {
   await deleteRecord(VAULT, id);
 }
 

@@ -14,12 +14,19 @@ export interface Sealed {
   ct: string; // base64 ciphertext (includes GCM tag)
 }
 
+// WebCrypto's lib types want an ArrayBuffer-backed view; @noble and our helpers
+// produce plain Uint8Array. This coercion keeps the crypto calls type-clean
+// without copying key material around.
+function bs(u: Uint8Array): BufferSource {
+  return u as unknown as BufferSource;
+}
+
 export async function importRawKey(
   raw: Uint8Array,
   usages: KeyUsage[],
   extractable = false,
 ): Promise<CryptoKey> {
-  return crypto.subtle.importKey("raw", raw, { name: "AES-GCM" }, extractable, usages);
+  return crypto.subtle.importKey("raw", bs(raw), { name: "AES-GCM" }, extractable, usages);
 }
 
 export function generateDataKeyBytes(): Uint8Array {
@@ -38,9 +45,9 @@ export async function seal(
   aad?: Uint8Array,
 ): Promise<Sealed> {
   const iv = randomBytes(IV_LENGTH);
-  const params: AesGcmParams = { name: "AES-GCM", iv };
-  if (aad) params.additionalData = aad;
-  const ct = await crypto.subtle.encrypt(params, key, plaintext);
+  const params: AesGcmParams = { name: "AES-GCM", iv: bs(iv) };
+  if (aad) params.additionalData = bs(aad);
+  const ct = await crypto.subtle.encrypt(params, key, bs(plaintext));
   return { iv: bytesToBase64(iv), ct: bytesToBase64(new Uint8Array(ct)) };
 }
 
@@ -55,8 +62,8 @@ export async function open(
 ): Promise<Uint8Array> {
   const iv = base64ToBytes(sealed.iv);
   const ct = base64ToBytes(sealed.ct);
-  const params: AesGcmParams = { name: "AES-GCM", iv };
-  if (aad) params.additionalData = aad;
-  const pt = await crypto.subtle.decrypt(params, key, ct);
+  const params: AesGcmParams = { name: "AES-GCM", iv: bs(iv) };
+  if (aad) params.additionalData = bs(aad);
+  const pt = await crypto.subtle.decrypt(params, key, bs(ct));
   return new Uint8Array(pt);
 }

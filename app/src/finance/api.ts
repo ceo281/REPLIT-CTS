@@ -74,7 +74,7 @@ export async function newTransaction(
   return saveTransaction(dek, { ...input, id: uid() });
 }
 
-export async function deleteTransaction(dek: CryptoKey, id: string): Promise<void> {
+export async function deleteTransaction(_dek: CryptoKey, id: string): Promise<void> {
   await deleteRecord(VAULT, id);
 }
 
@@ -99,6 +99,6 @@ export async function newBudget(
   return b;
 }
 
-export async function deleteBudget(dek: CryptoKey, id: string): Promise<void> {
+export async function deleteBudget(_dek: CryptoKey, id: string): Promise<void> {
   await deleteRecord(VAULT, id);
 }
