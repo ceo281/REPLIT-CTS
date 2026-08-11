@@ -107,9 +107,18 @@ export async function rawRowCount(vault: VaultKind): Promise<number> {
 }
 
 /** Export all raw ciphertext rows (for encrypted backup). No decryption. */
-export async function exportRawRows(): Promise<EncryptedRow[]> {
+export async function exportRawRows(vault?: VaultKind): Promise<EncryptedRow[]> {
   const db = await getDb();
-  return db.getAll("records");
+  if (!vault) return db.getAll("records");
+  return db.getAllFromIndex("records", "by_vault", vault);
+}
+
+/** Import raw ciphertext rows (for restore). No decryption; rows are opaque. */
+export async function importRawRows(rows: EncryptedRow[]): Promise<void> {
+  const db = await getDb();
+  const tx = db.transaction("records", "readwrite");
+  for (const row of rows) await tx.store.put(row);
+  await tx.done;
 }
 
 // ---- App-level non-secret key/value (counters, settings) -------------------
