@@ -266,21 +266,21 @@
   ];
   var DEFAULT_IDX = 3; // 528 Hz
 
-  /* ---------- Web Audio core (single shared context) ---------- */
-  var AC = null, master = null;
+  /* ---------- Web Audio core (single shared context) ----------
+     master ── destination
+       ├── freqBus   (volume slider)  ← healing-tone voices crossfade here
+       └── breathBus (breathing tone)
+     Separate buses so the two never tug on each other's level. */
+  var AC=null, master=null, freqBus=null, breathBus=null;
   function ctx(){
     if(!AC){
       AC = new (window.AudioContext||window.webkitAudioContext)();
-      master = AC.createGain(); master.gain.value = 0.0001; master.connect(AC.destination);
+      master = AC.createGain(); master.gain.value = 0.9; master.connect(AC.destination);
+      freqBus = AC.createGain(); freqBus.gain.value = 0.45; freqBus.connect(master);
+      breathBus = AC.createGain(); breathBus.gain.value = 0.0001; breathBus.connect(master);
     }
     if(AC.state === "suspended") AC.resume();
     return AC;
-  }
-  function fadeMasterTo(v, t){
-    var c=ctx(), now=c.currentTime;
-    master.gain.cancelScheduledValues(now);
-    master.gain.setValueAtTime(Math.max(master.gain.value,0.0001), now);
-    master.gain.exponentialRampToValueAtTime(Math.max(v,0.0001), now+t);
   }
 
   var ICON_PLAY='<path d="M8 5v14l11-7z"/>', ICON_PAUSE='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
@@ -341,7 +341,8 @@
       playIcon=document.getElementById("freqPlayIcon"),
       volEl=document.getElementById("freqVol");
 
-  var freqGain=null, oscA=null, oscB=null, currentIdx=-1, playing=false;
+  var voice=null, currentIdx=-1, playing=false;
+  var XFADE=1.8; // seconds — how long one tone melts into the next
   var EQ='<svg class="eq" viewBox="0 0 24 24" fill="#a7f3d0"><rect x="3" y="8" width="4" height="8" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><rect x="17" y="10" width="4" height="4" rx="1"/></svg>';
 
   FREQS.forEach(function(f,i){
@@ -354,34 +355,43 @@
     listEl.appendChild(b);
   });
 
-  function volValue(){ return Math.pow(volEl.value/100,1.6)*0.5; }
+  function volValue(){ return Math.pow(volEl.value/100,1.6)*0.9; }
 
-  function buildChain(hz){
+  // A "voice" is a self-contained tone (two softly-detuned sines) with its own
+  // fader. New voices fade in while old ones fade out, so tones never cut to silence.
+  function makeVoice(hz){
     var c=ctx();
-    freqGain=c.createGain(); freqGain.gain.value=0.0001;
-    var lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2200; lp.Q.value=0.4;
-    oscA=c.createOscillator(); oscA.type="sine"; oscA.frequency.value=hz;
-    oscB=c.createOscillator(); oscB.type="sine"; oscB.frequency.value=hz; oscB.detune.value=4;
+    var g=c.createGain(); g.gain.value=0.0001;
+    var lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2000; lp.Q.value=0.3;
+    var a=c.createOscillator(); a.type="sine"; a.frequency.value=hz;
+    var b=c.createOscillator(); b.type="sine"; b.frequency.value=hz; b.detune.value=3; // gentle warmth
     var mix=c.createGain(); mix.gain.value=0.5;
-    oscA.connect(mix); oscB.connect(mix); mix.connect(lp); lp.connect(freqGain); freqGain.connect(master);
-    oscA.start(); oscB.start();
+    a.connect(mix); b.connect(mix); mix.connect(lp); lp.connect(g); g.connect(freqBus);
+    a.start(); b.start();
+    return {a:a,b:b,g:g,hz:hz};
   }
-  function startTone(hz){
-    buildChain(hz);
+  function fadeOut(v,t){
+    if(!v) return;
     var c=ctx(), now=c.currentTime;
-    freqGain.gain.setValueAtTime(0.0001,now);
-    freqGain.gain.exponentialRampToValueAtTime(0.9, now+1.2);
-    fadeMasterTo(volValue(),1.2);
+    v.g.gain.cancelScheduledValues(now);
+    v.g.gain.setValueAtTime(Math.max(v.g.gain.value,0.0001), now);
+    v.g.gain.linearRampToValueAtTime(0.0001, now+t);   // linear = smooth, even crossfade
+    setTimeout(function(){ try{v.a.stop();v.b.stop();}catch(e){} }, t*1000+80);
   }
-  function stopTone(cb){
-    if(!oscA){ if(cb) cb(); return; }
+  function crossfadeTo(hz){
     var c=ctx(), now=c.currentTime;
-    freqGain.gain.cancelScheduledValues(now);
-    freqGain.gain.setValueAtTime(Math.max(freqGain.gain.value,0.0001),now);
-    freqGain.gain.exponentialRampToValueAtTime(0.0001, now+0.5);
-    var a=oscA,b=oscB; oscA=oscB=null;
-    setTimeout(function(){ try{a.stop();b.stop();}catch(e){} if(cb) cb(); },520);
+    var nv=makeVoice(hz);
+    nv.g.gain.setValueAtTime(0.0001, now);
+    nv.g.gain.linearRampToValueAtTime(0.9, now+XFADE);  // new tone swells in
+    fadeOut(voice, XFADE);                               // old tone melts out over the same time
+    voice=nv;
   }
+  function stopVoice(){ fadeOut(voice, 0.9); voice=null; }
+
+  function setVol(){ var c=ctx(),now=c.currentTime; freqBus.gain.cancelScheduledValues(now);
+    freqBus.gain.setValueAtTime(Math.max(freqBus.gain.value,0.0001),now);
+    freqBus.gain.linearRampToValueAtTime(Math.max(volValue(),0.0001), now+0.12); }
+
   function selectFreq(i){
     if(i===currentIdx && playing){ pause(); return; }
     var rows=listEl.children;
@@ -389,19 +399,19 @@
     currentIdx=i;
     var f=FREQS[i];
     nowEl.innerHTML='Now playing <strong>'+f.hz+' Hz · '+f.name+'</strong>';
-    stopTone(function(){
-      startTone(f.hz); playing=true;
-      playIcon.innerHTML=ICON_PAUSE; stateEl.textContent="playing "+f.hz+" Hz";
-      freqOn=true; syncActivity();
-    });
+    ctx(); setVol();
+    crossfadeTo(f.hz);          // seamless — no stop-then-start gap
+    playing=true;
+    playIcon.innerHTML=ICON_PAUSE; stateEl.textContent="playing "+f.hz+" Hz";
+    freqOn=true; syncActivity();
   }
-  function pause(){ stopTone(); playing=false; playIcon.innerHTML=ICON_PLAY; stateEl.textContent="paused"; freqOn=false; syncActivity(); }
+  function pause(){ stopVoice(); playing=false; playIcon.innerHTML=ICON_PLAY; stateEl.textContent="paused"; freqOn=false; syncActivity(); }
 
   playBtn.addEventListener("click",function(){
     if(playing){ pause(); return; }
     selectFreq(currentIdx<0?DEFAULT_IDX:currentIdx);
   });
-  volEl.addEventListener("input",function(){ if(playing) fadeMasterTo(volValue(),0.15); });
+  volEl.addEventListener("input",function(){ if(AC) setVol(); });
 
   /* ===================== CARD 3: 4-7-8 breathing ===================== */
   var orb=document.getElementById("orb"),
@@ -420,32 +430,37 @@
 
   function breathToneStart(){
     if(!soundOn) return;
-    var c=ctx();
+    var c=ctx(), now=c.currentTime;
     bGain=c.createGain(); bGain.gain.value=0.0001;
     bOsc=c.createOscillator(); bOsc.type="sine"; bOsc.frequency.value=432;
     var lpf=c.createBiquadFilter(); lpf.type="lowpass"; lpf.frequency.value=1600;
-    bOsc.connect(lpf); lpf.connect(bGain); bGain.connect(master);
-    fadeMasterTo(0.35,0.4); bOsc.start();
+    bOsc.connect(lpf); lpf.connect(bGain); bGain.connect(breathBus);
+    breathBus.gain.cancelScheduledValues(now);
+    breathBus.gain.setValueAtTime(Math.max(breathBus.gain.value,0.0001),now);
+    breathBus.gain.linearRampToValueAtTime(0.8, now+0.5);
+    bOsc.start();
   }
   function breathToneStop(){
     if(!bOsc) return;
     var c=ctx(), now=c.currentTime, o=bOsc, g=bGain;
     g.gain.cancelScheduledValues(now); g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),now);
-    g.gain.exponentialRampToValueAtTime(0.0001, now+0.4);
-    setTimeout(function(){ try{o.stop();}catch(e){} },450); bOsc=null; bGain=null;
+    g.gain.linearRampToValueAtTime(0.0001, now+0.6);
+    setTimeout(function(){ try{o.stop();}catch(e){} },650); bOsc=null; bGain=null;
   }
   function breathToneShape(p){
     if(!bOsc||!bGain) return;
     var c=ctx(), now=c.currentTime, dur=p.secs;
     bGain.gain.cancelScheduledValues(now); bGain.gain.setValueAtTime(Math.max(bGain.gain.value,0.0001),now);
+    bOsc.frequency.cancelScheduledValues(now);
+    bOsc.frequency.setValueAtTime(bOsc.frequency.value,now);   // start from current pitch — no jump
     if(p.name==="Inhale"){
-      bOsc.frequency.setValueAtTime(432,now); bOsc.frequency.linearRampToValueAtTime(540,now+dur);
-      bGain.gain.exponentialRampToValueAtTime(0.5,now+dur);
+      bOsc.frequency.linearRampToValueAtTime(540,now+dur);     // rising = breathe in
+      bGain.gain.linearRampToValueAtTime(0.5,now+dur);
     } else if(p.name==="Hold"){
-      bGain.gain.exponentialRampToValueAtTime(0.28,now+dur);
+      bGain.gain.linearRampToValueAtTime(0.30,now+dur);        // settle, hold steady pitch
     } else {
-      bOsc.frequency.setValueAtTime(bOsc.frequency.value,now); bOsc.frequency.linearRampToValueAtTime(324,now+dur);
-      bGain.gain.exponentialRampToValueAtTime(0.04,now+dur);
+      bOsc.frequency.linearRampToValueAtTime(324,now+dur);     // falling = breathe out
+      bGain.gain.linearRampToValueAtTime(0.05,now+dur);
     }
   }
   function runPhase(){
