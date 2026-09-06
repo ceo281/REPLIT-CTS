@@ -1,0 +1,17 @@
+# Replit configuration for the Mindful — Healing Sounds widget.
+# Serves the meditation-widget folder as a static site.
+run = "python3 -m http.server 8080 --directory meditation-widget"
+entrypoint = "meditation-widget/index.html"
+
+[nix]
+channel = "stable-24_05"
+
+# Expose the static server on the public Replit URL
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[deployment]
+run = ["sh", "-c", "python3 -m http.server 8080 --directory meditation-widget"]
+deploymentTarget = "static"
+publicDir = "meditation-widget"

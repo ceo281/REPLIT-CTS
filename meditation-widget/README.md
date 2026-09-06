@@ -41,6 +41,28 @@ Solfeggio + natural tuning, each played as a pure sine tone (with a gentle 4-cen
 > These are traditional/wellness associations, not medical claims. The widget is a relaxation
 > aid, not a medical device or treatment.
 
+## Run it on Replit
+
+The repo already has a `.replit` file, so it runs with no setup.
+
+1. In Replit: **Create Repl → Import from GitHub**.
+2. Paste the repo URL: `https://github.com/ceo281/REPLIT-CTS` and pick the
+   `claude/meditation-healing-sounds-pfyzsg` branch.
+3. Press **Run**. Replit serves the widget and opens the webview.
+4. Copy the public URL from the webview (looks like `https://<repl-name>.<user>.repl.co`) —
+   that link is your live widget, openable by anyone.
+
+To put it on your website, embed that Replit URL:
+
+```html
+<iframe src="https://YOUR-REPL-URL.repl.co"
+  title="Mindful — Healing Sounds"
+  style="width:100%;max-width:760px;height:1200px;border:0;border-radius:24px"
+  allow="autoplay" loading="lazy"></iframe>
+```
+
+(Under the hood the Run command is `python3 -m http.server 8080 --directory meditation-widget`.)
+
 ## How to embed it in another website
 
 ### Option A — iframe (recommended, keeps it isolated)
